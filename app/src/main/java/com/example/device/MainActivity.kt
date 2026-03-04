@@ -7,11 +7,21 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.lifecycleScope
+import com.example.device.model.Device
+import com.example.device.service.Constans
+import com.example.device.service.DeviceService
+
 import com.example.device.ui.theme.DeviceTheme
+import com.example.device.view.MainView
+import kotlinx.coroutines.launch
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,29 +29,26 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             DeviceTheme {
+                var devices by remember { mutableStateOf(listOf<Device>()) }
+                getDevice {
+                    result ->
+                    devices=result
+                }
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    MainView(Modifier.padding(innerPadding),
+                        device = devices)
                 }
             }
         }
     }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    DeviceTheme {
-        Greeting("Android")
+    private fun getDevice(onResult: (List<Device>)-> Unit){
+        val retrofit = Retrofit.Builder().baseUrl(Constans.BASE_URL).
+                addConverterFactory(GsonConverterFactory.create()).build()
+        val service = retrofit.create(DeviceService::class.java)
+        lifecycleScope.launch {
+            val devices = service.GetAllDevices()
+            onResult(devices)
+        }
     }
 }
