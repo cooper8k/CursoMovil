@@ -2,7 +2,6 @@ package com.example.device.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,7 +19,7 @@ import com.example.device.ui.theme.Typography
 
 @Composable
 fun MainView(modifier: Modifier,device : List<Device>) {
-    Column(){
+    Column{
         Text(
             text = "Comprar",
             modifier= modifier.background(Color.LightGray).padding(10.dp).fillMaxWidth(),
